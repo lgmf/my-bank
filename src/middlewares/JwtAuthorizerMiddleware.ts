@@ -16,7 +16,10 @@ function jwtAuthorizerMiddleware(req: Request, res: Response, next: NextFunction
   try {
     const [, token] = authorization.split(" ");
     const jwtPayload = jwtAuthorizer.verifyToken<JwtPayload>(token);
-    req.user = jwtPayload.user;
+
+    req.context.set("token", token);
+    req.context.set("userId", jwtPayload.user.id);
+
     next();
   } catch (error) {
     let message = "invalid token";

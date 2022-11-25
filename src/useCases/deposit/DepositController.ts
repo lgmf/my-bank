@@ -11,8 +11,9 @@ export class DepositController {
 
   async handle(req: Request, res: Response) {
     const body = req.body as WithdrawBody;
+    const userId = req.context.get("userId") as string;
 
-    await this.depositUseCase.execute({ userId: req.user!.id, amount: body.amount });
+    await this.depositUseCase.execute({ userId, amount: body.amount });
 
     res.status(201).send();
   }

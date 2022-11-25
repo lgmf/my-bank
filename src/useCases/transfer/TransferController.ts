@@ -15,7 +15,9 @@ export class TransferController {
   async handle(req: Request, res: Response) {
     const { recipientUserId, amount } = req.body as TransferBody;
 
-    await this.transferUseCase.execute({ senderUserId: req.user!.id, recipientUserId, amount });
+    const senderUserId = req.context.get("userId") as string;
+
+    await this.transferUseCase.execute({ senderUserId, recipientUserId, amount });
 
     res.status(201).send();
   }
