@@ -1,0 +1,40 @@
+// This is your Prisma schema file,
+// learn more about it in the docs: https://pris.ly/d/prisma-schema
+
+generator client {
+  provider        = "prisma-client-js"
+  previewFeatures = ["interactiveTransactions"]
+}
+
+datasource db {
+  provider = "mysql"
+  url      = env("DATABASE_URL")
+}
+
+model Account {
+  id          String        @id
+  balance     Float
+  user        User?
+  Transaction Transaction[]
+
+  @@map("accounts")
+}
+
+model User {
+  id        String  @id
+  username  String  @unique
+  password  String
+  account   Account @relation(fields: [accountId], references: [id])
+  accountId String  @unique
+
+  @@map("users")
+}
+
+model Transaction {
+  id        String  @id
+  amount    Float
+  account   Account @relation(fields: [accountId], references: [id])
+  accountId String
+
+  @@map("transactions")
+}
