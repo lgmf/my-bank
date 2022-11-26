@@ -7,9 +7,13 @@ import { UserRepository } from "@repositories/UserRepository";
 interface CreateUserDTO {
   username: string;
   password: string;
+  name: string;
 }
 
-type CreateUserResponseDTO = User & { token: string };
+interface CreateUserResponseDTO extends Omit<CreateUserDTO, "password"> {
+  token: string;
+  account: Account;
+};
 
 export class CreateUserUserCase {
   constructor(
@@ -17,9 +21,9 @@ export class CreateUserUserCase {
     private authorizer: Authorizer
   ) { }
 
-  async execute({ username, password }: CreateUserDTO): Promise<CreateUserResponseDTO> {
+  async execute({ username, password, name }: CreateUserDTO): Promise<CreateUserResponseDTO> {
     const account = new Account({ balance: 100 });
-    const user = new User({ username, password, account });
+    const user = new User({ username, password, account, name });
 
     const usernameAlreadyTaken = await this.userRepository.findByUserName(user.username);
 
@@ -31,6 +35,14 @@ export class CreateUserUserCase {
 
     const token = this.authorizer.createToken(user);
 
-    return { ...user, token };
+    return {
+      name: user.name,
+      username: user.username,
+      token,
+      account: {
+        id: account.id,
+        balance: account.balance
+      }
+    };
   }
 }

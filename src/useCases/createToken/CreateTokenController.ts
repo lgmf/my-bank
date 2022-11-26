@@ -1,14 +1,14 @@
 import { Request, Response } from "express";
 
-import { SignInUserCase } from "./SignInUseCase";
+import { CreateTokenUserCase } from "./CreateTokenUseCase";
 
 interface SignInBody {
   username: string;
   password: string;
 }
 
-export class SignInController {
-  constructor(private signInUseCase: SignInUserCase) { }
+export class CreateTokenController {
+  constructor(private signInUseCase: CreateTokenUserCase) { }
 
   async handle(req: Request, res: Response) {
     const body = req.body as SignInBody;

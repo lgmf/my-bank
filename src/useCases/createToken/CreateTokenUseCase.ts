@@ -7,7 +7,7 @@ interface SignInDTO {
   password: string;
 }
 
-export class SignInUserCase {
+export class CreateTokenUserCase {
   constructor(private userRepository: UserRepository, private authorizer: Authorizer) { }
 
   async execute({ username, password }: SignInDTO) {
@@ -17,7 +17,7 @@ export class SignInUserCase {
       throw new UnauthorizedHttpException("Invalid username or password");
     }
 
-    if (user.password !== password) {
+    if (!user.verifyPassword(password)) {
       throw new UnauthorizedHttpException("Invalid username or password");
     }
 

@@ -22,10 +22,12 @@ model Account {
 
 model User {
   id        String  @id
+  name      String  @db.VarChar(240)
   username  String  @unique
+  salt      String
   password  String
-  account   Account @relation(fields: [accountId], references: [id])
   accountId String  @unique
+  account   Account @relation(fields: [accountId], references: [id])
 
   @@map("users")
 }

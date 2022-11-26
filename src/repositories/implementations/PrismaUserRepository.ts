@@ -3,6 +3,18 @@ import prisma from "@core/orm/prisma";
 
 import { UserRepository } from "../UserRepository";
 
+interface UserDTO {
+  id: string;
+  name: string;
+  salt: string;
+  password: string;
+  username: string;
+  account: {
+    id: string,
+    balance: number;
+  }
+}
+
 export class PrismaUserRepository implements UserRepository {
   private static instance: PrismaUserRepository | null = null;
 
@@ -14,12 +26,26 @@ export class PrismaUserRepository implements UserRepository {
     return PrismaUserRepository.instance;
   }
 
+  private static toEntity(user: UserDTO): InstanceType<typeof User> {
+    return new User({
+      name: user.name,
+      password: user.password,
+      username: user.username,
+      account: {
+        id: user.account.id,
+        balance: user.account.balance
+      }
+    }, user.id, user.salt);
+  }
+
   private constructor() { }
 
   async create(user: User): Promise<void> {
     await prisma.user.create({
       data: {
         id: user.id,
+        name: user.name,
+        salt: user.salt,
         password: user.password,
         username: user.username,
         account: {
@@ -46,15 +72,17 @@ export class PrismaUserRepository implements UserRepository {
       return;
     }
 
-    return user;
+    return PrismaUserRepository.toEntity(user);
   }
 
-  list(): Promise<User[]> {
-    return prisma.user.findMany({
+  async list(): Promise<User[]> {
+    const users = await prisma.user.findMany({
       include: {
         account: true
       }
     });
+
+    return users.map((user) => PrismaUserRepository.toEntity(user));
   }
 
   async findById(id: string): Promise<User | undefined> {
@@ -71,6 +99,6 @@ export class PrismaUserRepository implements UserRepository {
       return;
     }
 
-    return user;
+    return PrismaUserRepository.toEntity(user);
   }
 }
