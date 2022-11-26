@@ -1,5 +1,6 @@
 import { User } from "@core/entities/User";
 import prisma from "@core/orm/prisma";
+import { Search } from "@core/search";
 
 import { UserRepository } from "../UserRepository";
 
@@ -75,8 +76,19 @@ export class PrismaUserRepository implements UserRepository {
     return PrismaUserRepository.toEntity(user);
   }
 
-  async list(): Promise<User[]> {
+  async list({ offset, limit, query }: Search): Promise<User[]> {
+
     const users = await prisma.user.findMany({
+      skip: offset,
+      take: limit,
+      where: {
+        username: {
+          search: query
+        },
+        name: {
+          search: query
+        }
+      },
       include: {
         account: true
       }

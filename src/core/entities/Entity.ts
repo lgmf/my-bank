@@ -5,14 +5,16 @@ import { ValidationException } from "../exceptions/ValidationException";
 
 export class Entity<P> {
   readonly id: string;
+  protected readonly validationResult: Joi.ValidationResult;
 
   constructor(propsSchema: Joi.ObjectSchema, props: P, id?: string) {
-    const { error } = propsSchema.validate(props);
+    const validationResult = propsSchema.validate(props);
 
-    if (error) {
-      throw new ValidationException(error.message);
+    if (validationResult.error) {
+      throw new ValidationException(validationResult.error.message);
     }
 
     this.id = id ? id : crypto.randomUUID();
+    this.validationResult = validationResult;
   }
 }

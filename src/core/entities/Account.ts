@@ -15,6 +15,8 @@ export class Account extends Entity<AccountProps> {
   constructor(props: AccountProps, id?: string) {
     super(accountPropsSchema, props, id);
 
-    this.balance = props.balance;
+    const { balance } = this.validationResult.value as AccountProps;
+
+    this.balance = balance;
   }
 }

@@ -3,7 +3,7 @@
 
 generator client {
   provider        = "prisma-client-js"
-  previewFeatures = ["interactiveTransactions"]
+  previewFeatures = ["interactiveTransactions", "fullTextIndex", "fullTextSearch"]
 }
 
 datasource db {
@@ -29,6 +29,7 @@ model User {
   accountId String  @unique
   account   Account @relation(fields: [accountId], references: [id])
 
+  @@fulltext([name, username])
   @@map("users")
 }
 

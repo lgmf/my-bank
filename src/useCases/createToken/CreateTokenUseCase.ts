@@ -7,7 +7,7 @@ interface SignInDTO {
   password: string;
 }
 
-export class CreateTokenUserCase {
+export class CreateTokenUseCase {
   constructor(private userRepository: UserRepository, private authorizer: Authorizer) { }
 
   async execute({ username, password }: SignInDTO) {
