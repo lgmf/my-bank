@@ -1,0 +1,30 @@
+version: '3'
+
+services:
+  db:
+    container_name: my-bank-db
+    image: mysql:8.0.29
+    ports:
+      - 3306:3306
+    environment:
+      MYSQL_RANDOM_ROOT_PASSWORD: "yes"
+      MYSQL_DATABASE: my_bank
+      MYSQL_USER: api-dev
+      MYSQL_PASSWORD: mypassword
+    healthcheck:
+      test: [ "CMD", "mysqladmin", "ping", "-h", "localhost" ]
+      timeout: 20s
+      retries: 10
+
+  api:
+    container_name: my-bank-api
+    build: .
+    ports:
+      - 7000:7000
+    environment:
+      DATABASE_URL: mysql://api-dev:mypassword@db:3306/my_bank
+      JWT_SECRET: dev-secret
+      PORT: 7000
+    depends_on:
+      db:
+        condition: service_healthy

@@ -6,7 +6,7 @@
   "scripts": {
     "dev": "tsnd --exit-child -r tsconfig-paths/register src/server.ts",
     "build": "tsc",
-    "prestart": "npm run build",
+    "prestart": "npm run build && prisma migrate deploy",
     "start": "node ./dist/server.js"
   },
   "keywords": [],
