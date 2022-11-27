@@ -32,10 +32,7 @@ export class PrismaUserRepository implements UserRepository {
       name: user.name,
       password: user.password,
       username: user.username,
-      account: {
-        id: user.account.id,
-        balance: user.account.balance
-      }
+      account: user.account,
     }, user.id, user.salt);
   }
 

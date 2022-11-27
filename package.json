@@ -6,7 +6,8 @@
   "scripts": {
     "dev": "tsnd --exit-child -r tsconfig-paths/register src/server.ts",
     "build": "tsc",
-    "start": "node server.js"
+    "prestart": "npm run build",
+    "start": "node ./dist/server.js"
   },
   "keywords": [],
   "author": "",
@@ -29,6 +30,15 @@
     "express-async-errors": "^3.1.1",
     "express-routemap": "^1.6.0",
     "joi": "^17.7.0",
-    "jsonwebtoken": "^8.5.1"
+    "jsonwebtoken": "^8.5.1",
+    "module-alias": "^2.2.2"
+  },
+  "_moduleAliases": {
+    "@config": "dist/config",
+    "@core": "dist/core",
+    "@middlewares": "dist/middlewares",
+    "@repositories": "dist/repositories",
+    "@useCases": "dist/useCases",
+    "@routes": "dist/routes"
   }
 }

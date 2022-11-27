@@ -15,11 +15,7 @@ export class RetrieveAccountUserCase {
   constructor(private userRepository: UserRepository) { }
 
   async execute({ userId }: RetrieveAccountDTO): Promise<AccountDTO> {
-    console.log("userId", userId);
-    
     const user = await this.userRepository.findById(userId);
-
-    console.log("user", user);
 
     if (!user) {
       throw new NotFoundHttpException("user not found");

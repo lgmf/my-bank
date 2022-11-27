@@ -5,7 +5,6 @@ import { ValidationException } from "../exceptions/ValidationException";
 
 export class Entity<P> {
   readonly id: string;
-  protected readonly validationResult: Joi.ValidationResult;
 
   constructor(propsSchema: Joi.ObjectSchema, props: P, id?: string) {
     const validationResult = propsSchema.validate(props);
@@ -15,6 +14,5 @@ export class Entity<P> {
     }
 
     this.id = id ? id : crypto.randomUUID();
-    this.validationResult = validationResult;
   }
 }

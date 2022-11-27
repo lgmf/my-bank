@@ -1,4 +1,5 @@
 import displayRoutes from "express-routemap";
+import 'module-alias/register';
 
 import app from "./app";
 import environment from "./config/environment";
