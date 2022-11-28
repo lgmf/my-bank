@@ -15,6 +15,7 @@ function jwtAuthorizerMiddleware(req: Request, res: Response, next: NextFunction
 
   try {
     const [, token] = authorization.split(" ");
+    console.log("token", token);
     const jwtPayload = jwtAuthorizer.verifyToken<JwtPayload>(token);
 
     req.context.set("token", token);

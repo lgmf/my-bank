@@ -5,6 +5,7 @@ dist
 # Local .terraform directories
 **/.terraform/*
 *.terraform.*
+**/terraform/*.svg
 
 # .tfstate files
 *.tfstate
