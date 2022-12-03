@@ -5,17 +5,19 @@ import { UnauthorizedHttpException } from "@core/exceptions/HttpException";
 
 const jwtAuthorizer = new JwtAuthorizer();
 
-function jwtAuthorizerMiddleware(req: Request, res: Response, next: NextFunction) {
+function jwtAuthorizerMiddleware(
+  req: Request,
+  res: Response,
+  next: NextFunction
+) {
   const authorization = req.headers.authorization;
 
   if (!authorization) {
     throw new UnauthorizedHttpException("Missing authorization header");
   }
 
-
   try {
     const [, token] = authorization.split(" ");
-    console.log("token", token);
     const jwtPayload = jwtAuthorizer.verifyToken<JwtPayload>(token);
 
     req.context.set("token", token);
@@ -31,7 +33,6 @@ function jwtAuthorizerMiddleware(req: Request, res: Response, next: NextFunction
 
     throw new UnauthorizedHttpException(message);
   }
-
 }
 
 export default jwtAuthorizerMiddleware;

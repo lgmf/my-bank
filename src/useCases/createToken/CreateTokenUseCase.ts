@@ -1,16 +1,27 @@
 import { Authorizer } from "@core/authorizer/Authorizer";
+import { User } from "@core/entities/User";
 import { UnauthorizedHttpException } from "@core/exceptions/HttpException";
 import { UserRepository } from "@repositories/UserRepository";
 
-interface SignInDTO {
+interface CreateTokenDTO {
   username: string;
   password: string;
 }
 
-export class CreateTokenUseCase {
-  constructor(private userRepository: UserRepository, private authorizer: Authorizer) { }
+interface UserDTO {
+  id: string;
+  username: string;
+  name: string;
+  token: string;
+}
 
-  async execute({ username, password }: SignInDTO) {
+export class CreateTokenUseCase {
+  constructor(
+    private userRepository: UserRepository,
+    private authorizer: Authorizer
+  ) {}
+
+  async execute({ username, password }: CreateTokenDTO): Promise<UserDTO> {
     const user = await this.userRepository.findByUserName(username);
 
     if (!user) {
@@ -21,6 +32,13 @@ export class CreateTokenUseCase {
       throw new UnauthorizedHttpException("Invalid username or password");
     }
 
-    return this.authorizer.createToken(user);
+    const token = await this.authorizer.createToken(user);
+
+    return {
+      id: user.id,
+      name: user.name,
+      username: user.username,
+      token,
+    };
   }
 }
