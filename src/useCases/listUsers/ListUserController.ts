@@ -9,12 +9,13 @@ interface ListUserQuery {
 }
 
 export class ListUserController {
-  constructor(private signInUseCase: ListUserUseCase) { }
+  constructor(private signInUseCase: ListUserUseCase) {}
 
   async handle(req: Request, res: Response) {
     const query = req.query as ListUserQuery;
+    const userId = req.context.get("userId") as string;
 
-    const users = await this.signInUseCase.execute(query);
+    const users = await this.signInUseCase.execute(userId, query);
 
     res.status(200).json({ results: users });
   }

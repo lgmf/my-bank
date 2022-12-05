@@ -15,20 +15,20 @@ export class PrismaAccountRepository implements AccountRepository {
     return PrismaAccountRepository.instance;
   }
 
-  private constructor() { }
+  private constructor() {}
 
   async save(account: Account) {
     await prisma.account.upsert({
       where: {
-        id: account.id
+        id: account.id,
       },
       update: {
-        balance: account.balance
+        balance: account.balance,
       },
       create: {
         id: account.id,
-        balance: account.balance
-      }
+        balance: account.balance,
+      },
     });
   }
 
@@ -43,10 +43,10 @@ export class PrismaAccountRepository implements AccountRepository {
             decrement: amount,
           },
         },
-      })
+      });
 
       if (sender.balance < 0) {
-        throw new ValidationException("sender doesn't have enough money")
+        throw new ValidationException("sender doesn't have enough money");
       }
 
       await tx.account.update({
@@ -58,7 +58,19 @@ export class PrismaAccountRepository implements AccountRepository {
             increment: amount,
           },
         },
-      })
-    })
+      });
+    });
+  }
+
+  async findByUserId(userId: string): Promise<Account | undefined> {
+    const account = await prisma.account.findFirst({
+      where: { user: { id: userId } },
+    });
+
+    if (!account) {
+      return;
+    }
+
+    return account;
   }
 }

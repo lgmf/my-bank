@@ -34,10 +34,11 @@ model User {
 }
 
 model Transaction {
-  id        String  @id
+  id        String   @id
   amount    Float
-  account   Account @relation(fields: [accountId], references: [id])
+  account   Account  @relation(fields: [accountId], references: [id])
   accountId String
+  createdAt DateTime @default(now())
 
   @@map("transactions")
 }

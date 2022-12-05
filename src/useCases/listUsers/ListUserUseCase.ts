@@ -11,16 +11,16 @@ interface UserDTO {
   id: string;
   name: string;
   username: string;
-  account: {
+  account?: {
     id: string;
     balance: number;
-  }
+  };
 }
 
 export class ListUserUseCase {
-  constructor(private userRepository: UserRepository) { }
+  constructor(private userRepository: UserRepository) {}
 
-  async execute(payload: ListUserDTO): Promise<UserDTO[]> {
+  async execute(userId: string, payload: ListUserDTO): Promise<UserDTO[]> {
     const search = new Search(payload);
 
     const users = await this.userRepository.list(search);
@@ -29,10 +29,13 @@ export class ListUserUseCase {
       id: user.id,
       name: user.name,
       username: user.username,
-      account: {
-        id: user.account.id,
-        balance: user.account.balance
-      }
+      account:
+        user.id === userId
+          ? {
+              id: user.account.id,
+              balance: user.account.balance,
+            }
+          : undefined,
     }));
   }
 }
