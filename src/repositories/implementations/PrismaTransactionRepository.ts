@@ -22,29 +22,48 @@ export class PrismaTransactionRepository implements TransactionRepository {
       data: {
         id: transaction.id,
         amount: transaction.amount,
-        accountId: transaction.account.id,
+        recipientId: transaction.recipient.id,
+        senderId: transaction.sender.id,
       },
     });
   }
 
-  async list(
-    accountId: string,
+  async listByUserId(
+    userId: string,
     { offset, limit }: Search
   ): Promise<Transaction[]> {
     const transactions = await prisma.transaction.findMany({
       skip: offset,
       take: limit,
       where: {
-        accountId,
+        OR: [
+          {
+            senderId: userId,
+          },
+          {
+            recipientId: userId,
+          },
+        ],
       },
       include: {
-        account: true,
+        recipient: true,
+        sender: true,
       },
       orderBy: {
         createdAt: "desc",
       },
     });
 
-    return transactions;
+    return transactions.map((transaction) => {
+      return new Transaction(
+        {
+          amount: transaction.amount,
+          recipient: transaction.recipient,
+          sender: transaction.sender,
+          createdAt: transaction.createdAt,
+        },
+        transaction.id
+      );
+    });
   }
 }

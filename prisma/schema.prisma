@@ -12,33 +12,36 @@ datasource db {
 }
 
 model Account {
-  id          String        @id
-  balance     Float
-  user        User?
-  Transaction Transaction[]
+  id      String @id
+  balance Float
+  user    User?
 
   @@map("accounts")
 }
 
 model User {
-  id        String  @id
-  name      String  @db.VarChar(240)
-  username  String  @unique
+  id        String        @id
+  name      String        @db.VarChar(240)
+  username  String        @unique
   salt      String
   password  String
-  accountId String  @unique
-  account   Account @relation(fields: [accountId], references: [id])
+  accountId String        @unique
+  account   Account       @relation(fields: [accountId], references: [id])
+  sent      Transaction[] @relation("sender")
+  received  Transaction[] @relation("recipient")
 
   @@fulltext([name, username])
   @@map("users")
 }
 
 model Transaction {
-  id        String   @id
-  amount    Float
-  account   Account  @relation(fields: [accountId], references: [id])
-  accountId String
-  createdAt DateTime @default(now())
+  id          String   @id
+  amount      Float
+  createdAt   DateTime @default(now())
+  sender      User     @relation("sender", fields: [senderId], references: [id])
+  senderId    String
+  recipient   User     @relation("recipient", fields: [recipientId], references: [id])
+  recipientId String
 
   @@map("transactions")
 }

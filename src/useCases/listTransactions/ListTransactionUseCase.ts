@@ -1,6 +1,5 @@
-import { NotFoundHttpException } from "@core/exceptions/HttpException";
+import { TransactionType } from "@core/entities/Transaction";
 import { Search } from "@core/search";
-import { AccountRepository } from "@repositories/AccountRepository";
 import { TransactionRepository } from "@repositories/TransactionRepository";
 
 interface ListTransactionDTO {
@@ -11,36 +10,44 @@ interface ListTransactionDTO {
 interface TransactionDTO {
   id: string;
   amount: number;
-  type: "deposit" | "withdraw";
+  type: TransactionType;
   createdAt: Date;
+  sender: {
+    id: string;
+    name: string;
+  };
+  recipient: {
+    id: string;
+    name: string;
+  };
 }
 export class ListTransactionUseCase {
-  constructor(
-    private accountRepository: AccountRepository,
-    private transactionRepository: TransactionRepository
-  ) {}
+  constructor(private transactionRepository: TransactionRepository) {}
 
   async execute(
     userId: string,
     payload: ListTransactionDTO
   ): Promise<TransactionDTO[]> {
-    const account = await this.accountRepository.findByUserId(userId);
-
-    if (!account) {
-      throw new NotFoundHttpException("account not found");
-    }
-
     const search = new Search(payload);
-    const transactions = await this.transactionRepository.list(
-      account.id,
+
+    const transactions = await this.transactionRepository.listByUserId(
+      userId,
       search
     );
 
-    return transactions.map(({ id, amount, createdAt }) => ({
-      id,
-      amount,
-      type: amount < 0 ? "withdraw" : "deposit",
-      createdAt,
+    return transactions.map((transaction) => ({
+      id: transaction.id,
+      amount: transaction.amount,
+      type: transaction.type,
+      createdAt: transaction.createdAt,
+      sender: {
+        id: transaction.sender.id,
+        name: transaction.sender.name,
+      },
+      recipient: {
+        id: transaction.recipient.id,
+        name: transaction.recipient.name,
+      },
     }));
   }
 }

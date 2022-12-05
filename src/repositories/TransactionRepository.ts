@@ -1,7 +1,9 @@
 import { Transaction } from "@core/entities/Transaction";
 import { Search } from "@core/search";
 
+type TransactionInstance = InstanceType<typeof Transaction>;
+
 export interface TransactionRepository {
   create(transaction: Transaction): Promise<void>;
-  list(accountId: string, search: Search): Promise<Transaction[]>;
+  listByUserId(userId: string, search: Search): Promise<TransactionInstance[]>;
 }

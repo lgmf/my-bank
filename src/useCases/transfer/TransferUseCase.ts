@@ -1,6 +1,11 @@
 import { Account } from "@core/entities/Account";
-import { BadRequestHttpException, NotFoundHttpException } from "@core/exceptions/HttpException";
+import { Transaction } from "@core/entities/Transaction";
+import {
+  BadRequestHttpException,
+  NotFoundHttpException,
+} from "@core/exceptions/HttpException";
 import { AccountRepository } from "@repositories/AccountRepository";
+import { TransactionRepository } from "@repositories/TransactionRepository";
 import { UserRepository } from "@repositories/UserRepository";
 
 interface TransferDTO {
@@ -12,8 +17,9 @@ interface TransferDTO {
 export class TransferUserCase {
   constructor(
     private userRepository: UserRepository,
-    private accountRepository: AccountRepository
-  ) { }
+    private accountRepository: AccountRepository,
+    private transactionRepository: TransactionRepository
+  ) {}
 
   async execute({ senderUserId, recipientUserId, amount }: TransferDTO) {
     if (senderUserId === recipientUserId) {
@@ -36,9 +42,28 @@ export class TransferUserCase {
       throw new NotFoundHttpException("recipient not found");
     }
 
-    const senderAccount = new Account({ balance: sender.account.balance - amount }, sender.account.id);
-    const recipientAccount = new Account({ balance: recipient.account.balance + amount }, recipient.account.id);
+    const senderAccount = new Account(
+      { balance: sender.account.balance - amount },
+      sender.account.id
+    );
 
-    await this.accountRepository.transfer(senderAccount, recipientAccount, amount);
+    const recipientAccount = new Account(
+      { balance: recipient.account.balance + amount },
+      recipient.account.id
+    );
+
+    const transaction = new Transaction({
+      amount,
+      sender,
+      recipient,
+    });
+
+    await this.accountRepository.transfer(
+      senderAccount,
+      recipientAccount,
+      amount
+    );
+
+    await this.transactionRepository.create(transaction);
   }
 }
